@@ -92,13 +92,21 @@ class HashTable:
 
         Implement this
         """
+     
         index=self.hash_index(key)
         node=self.storage[index]
+
         if node is not None:
             if node.key==key:
-                node.value = None
+                node.value=None
             else:
-                print("Key not found")
+                cur_node=node.next
+                while cur_node:
+                    if cur_node.key==key:
+                        cur_node.value= None
+                    cur_node=cur_node.next
+        else:
+            print("Key not found")
 
     def get(self, key):
         """
