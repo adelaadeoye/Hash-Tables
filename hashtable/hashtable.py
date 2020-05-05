@@ -16,6 +16,10 @@ class HashTable:
 
     Implement this.
     """
+    def __init__(self,capacity):
+        self.capacity=capacity
+        self.storage=[None]*capacity
+        self.count=0
 
     def fnv1(self, key):
         """
@@ -30,6 +34,24 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
+        hash = 5381
+        ht = 0
+
+        ord_func = ord
+        try:
+            ord_func(key[0])
+        except TypeError:
+        # bytearray
+            ord_func = lambda x: x
+        except IndexError:
+            return hash
+
+        for c in key:
+       
+            ht = (hash * 33) % (2**32)
+            hash = (ht + ord_func(c)) % (2**32)
+
+        return hash
 
     def hash_index(self, key):
         """
@@ -47,6 +69,20 @@ class HashTable:
 
         Implement this.
         """
+        index=self.hash_index(key)
+        node=self.storage[index]
+
+        if not node:
+            self.storage[index]=HashTableEntry(key,value)
+            return
+        while node:
+            if node.key== key:
+                node.value= value
+                break
+            elif node.next:
+                node = node.next
+            else:
+                node.next= HashTableEntry(key,value)
 
     def delete(self, key):
         """
@@ -54,8 +90,15 @@ class HashTable:
 
         Print a warning if the key is not found.
 
-        Implement this.
+        Implement this
         """
+        index=self.hash_index(key)
+        node=self.storage[index]
+        if node is not None:
+            if node.key==key:
+                node.value = None
+            else:
+                print("Key not found")
 
     def get(self, key):
         """
@@ -65,8 +108,21 @@ class HashTable:
 
         Implement this.
         """
+        index=self.hash_index(key)
+        node=self.storage[index]
 
-    def resize(self):
+        if node is not None:
+            if node.key==key:
+                return node.value
+            else:
+                cur_node=node.next
+                while cur_node:
+                    if cur_node.key==key:
+                        return cur_node.value
+                    cur_node=cur_node.next
+        else:
+            return None
+    def resize(self, new_capacity):
         """
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
