@@ -20,6 +20,8 @@ class HashTable:
         self.capacity=capacity
         self.storage=[None]*capacity
         self.count=0
+        self.loadFactor= self.count/ len(self.storage)
+
 
     def fnv1(self, key):
         """
@@ -68,7 +70,11 @@ class HashTable:
         Hash collisions should be handled with Linked List Chaining.
 
         Implement this.
+        
         """
+        if self.loadFactor > 0.7:
+            new_capacity= 2 * self.capacity
+            self.resize(new_capacity)
         index=self.hash_index(key)
         node=self.storage[index]
 
@@ -78,6 +84,7 @@ class HashTable:
         while node:
             if node.key== key:
                 node.value= value
+                self.count +=1
                 break
             elif node.next:
                 node = node.next
@@ -99,11 +106,13 @@ class HashTable:
         if node is not None:
             if node.key==key:
                 node.value=None
+                self.count -=1
             else:
                 cur_node=node.next
                 while cur_node:
                     if cur_node.key==key:
                         cur_node.value= None
+                        self.count -=1
                     cur_node=cur_node.next
         else:
             print("Key not found")
@@ -136,7 +145,18 @@ class HashTable:
         rehash all key/value pairs.
 
         Implement this.
+
         """
+        new_storage=[None]* new_capacity
+        #Iterate through the old storage
+        for i in range(len(self.storage)):
+            #Copy the from the old storage
+            new_storage[i]=self.storage[i]
+           
+
+        #Make the old storage the new storage
+        self.storage=new_storage
+        
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -154,7 +174,7 @@ if __name__ == "__main__":
 
     # Test resizing
     old_capacity = len(ht.storage)
-    ht.resize()
+    ht.resize(8)
     new_capacity = len(ht.storage)
 
     print(f"\nResized from {old_capacity} to {new_capacity}.\n")
